@@ -1,6 +1,15 @@
-import { RouterProvider } from "react-router-dom";
-import { routerConfig } from "./routes";
+import { RouterProvider } from 'react-router-dom';
+import { routerConfig } from './routes';
+import { CallHandler } from '@/components/call/CallHandler';
+import { useUser } from '@/context/user.context';
 
 export const App = () => {
-  return <RouterProvider router={routerConfig} />;
+  const { user } = useUser();
+
+  return (
+    <>
+      {user && <CallHandler userId={user._id} />}
+      <RouterProvider router={routerConfig} />
+    </>
+  );
 };

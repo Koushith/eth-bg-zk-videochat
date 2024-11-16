@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Plus } from 'lucide-react';
+import { Plus, Phone } from 'lucide-react';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader } from '@/components/ui/card';
@@ -98,20 +98,32 @@ export function ChatListScreen() {
             {users.map((user) => (
               <div
                 key={user._id}
-                className="flex items-center space-x-4 cursor-pointer hover:bg-accent p-4 rounded-lg transition-colors duration-200"
-                onClick={() => navigate(`/chat/${user._id}`)}
+                className="flex items-center justify-between cursor-pointer hover:bg-accent p-4 rounded-lg transition-colors duration-200"
               >
-                <Avatar className="h-12 w-12">
-                  <AvatarImage
-                    src={`https://api.dicebear.com/6.x/initials/svg?seed=${user.userName}`}
-                    alt={user.userName}
-                  />
-                  <AvatarFallback>{user.userName[0]}</AvatarFallback>
-                </Avatar>
-                <div>
-                  <p className="text-lg font-medium leading-none">{user.userName}</p>
-                  <p className="text-sm text-muted-foreground mt-1">{user.email}</p>
+                <div className="flex items-center space-x-4" onClick={() => navigate(`/chat/${user._id}`)}>
+                  <Avatar className="h-12 w-12">
+                    <AvatarImage
+                      src={`https://api.dicebear.com/6.x/initials/svg?seed=${user.userName}`}
+                      alt={user.userName}
+                    />
+                    <AvatarFallback>{user.userName[0]}</AvatarFallback>
+                  </Avatar>
+                  <div>
+                    <p className="text-lg font-medium leading-none">{user.userName}</p>
+                    <p className="text-sm text-muted-foreground mt-1">{user.email}</p>
+                  </div>
                 </div>
+                <Button
+                  size="icon"
+                  variant="ghost"
+                  className="rounded-full"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    initiateCall(user._id);
+                  }}
+                >
+                  <Phone className="h-5 w-5" />
+                </Button>
               </div>
             ))}
           </div>
