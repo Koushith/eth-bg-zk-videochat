@@ -1,96 +1,67 @@
-import { Menu, Package2, Search } from "lucide-react";
+import { Menu, Package2, Search, LogOut } from 'lucide-react';
 
-import { Button } from "@/components/ui/button";
+import { Button } from '@/components/ui/button';
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
-import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
-import { Link, Navigate, Outlet, useNavigate } from "react-router-dom";
+} from '@/components/ui/dropdown-menu';
+import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
+import { Link, Navigate, Outlet, useNavigate } from 'react-router-dom';
 
-import { Moon, Sun } from "lucide-react";
-import { useTheme } from "@/theme/theme-provider";
-import { Toaster } from "@/components/ui/toaster";
-import { Avatar, AvatarFallback } from "@radix-ui/react-avatar";
-import { useUser } from "@/context/user.context";
+import { Moon, Sun } from 'lucide-react';
+import { useTheme } from '@/theme/theme-provider';
+import { Toaster } from '@/components/ui/toaster';
+import { Avatar, AvatarFallback } from '@radix-ui/react-avatar';
+import { usePrivy } from '@privy-io/react-auth';
 
 export const RootLayout = () => {
   const { setTheme } = useTheme();
-  const { user } = useUser()
-  const navigate = useNavigate()
-  console.log("user from context", user)
+  const navigate = useNavigate();
+  const { user, logout, authenticated } = usePrivy();
+
   return (
     <div className="flex min-h-screen w-full flex-col">
       <header className="container sticky top-0 flex h-16 items-center gap-4 border-b bg-background px-4 md:px-6">
         <nav className="hidden flex-col gap-6 text-lg font-medium md:flex md:flex-row md:items-center md:gap-5 md:text-sm lg:gap-6">
-          <Link
-            className="flex items-center gap-2 text-lg font-semibold md:text-base"
-            to={""}
-          >
+          <Link className="flex items-center gap-2 text-lg font-semibold md:text-base" to={''}>
             <Package2 className="h-6 w-6" />
             <span className="sr-only">Acme Inc</span>
           </Link>
-          <Link
-            className="text-foreground transition-colors hover:text-foreground"
-            to={""}
-          >
+          <Link className="text-foreground transition-colors hover:text-foreground" to={''}>
             Home
           </Link>
-          <Link
-            className="text-muted-foreground transition-colors hover:text-foreground"
-            to={"/profile"}
-          >
+          <Link className="text-muted-foreground transition-colors hover:text-foreground" to={'/profile'}>
             Profile
           </Link>
-          <Link
-            className="text-muted-foreground transition-colors hover:text-foreground"
-            to={"/settings"}
-          >
+          <Link className="text-muted-foreground transition-colors hover:text-foreground" to={'/settings'}>
             Settings
           </Link>
-          
         </nav>
         <Sheet>
           <SheetTrigger asChild>
-            <Button
-              variant="outline"
-              size="icon"
-              className="shrink-0 md:hidden"
-            >
+            <Button variant="outline" size="icon" className="shrink-0 md:hidden">
               <Menu className="h-5 w-5" />
               <span className="sr-only">Toggle navigation menu</span>
             </Button>
           </SheetTrigger>
           <SheetContent side="left">
             <nav className="grid gap-6 text-lg font-medium">
-              <Link
-                className="flex items-center gap-2 text-lg font-semibold"
-                to={""}
-              >
+              <Link className="flex items-center gap-2 text-lg font-semibold" to={''}>
                 <Package2 className="h-6 w-6" />
                 <span className="sr-only">Acme Inc</span>
               </Link>
-              <Link className="hover:text-foreground" to={""}>
+              <Link className="hover:text-foreground" to={''}>
                 Home
               </Link>
-              <Link
-                className="text-muted-foreground hover:text-foreground"
-                to={""}
-              >
+              <Link className="text-muted-foreground hover:text-foreground" to={''}>
                 About
               </Link>
-              <Link
-                className="text-muted-foreground hover:text-foreground"
-                to={""}
-              >
+              <Link className="text-muted-foreground hover:text-foreground" to={''}>
                 Developers
               </Link>
-              <Link
-                className="text-muted-foreground hover:text-foreground"
-                to={""}
-              >
+              <Link className="text-muted-foreground hover:text-foreground" to={''}>
                 Profile
               </Link>
             </nav>
@@ -109,12 +80,21 @@ export const RootLayout = () => {
               </Button>
             </div>
           </form>
-          {user ? (
-            <Avatar className="h-8 w-8">
-              <AvatarFallback>
-                {user.name ? user.name.charAt(0).toUpperCase() : 'U'}
-              </AvatarFallback>
-            </Avatar>
+          {authenticated ? (
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Avatar className="h-8 w-8 cursor-pointer">
+                  <AvatarFallback>{user?.email?.charAt(0).toUpperCase() || 'U'}</AvatarFallback>
+                </Avatar>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end">
+                <DropdownMenuItem onClick={() => navigate('/profile')}>Profile</DropdownMenuItem>
+                <DropdownMenuItem onClick={logout}>
+                  <LogOut className="mr-2 h-4 w-4" />
+                  Logout
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
           ) : (
             <Button variant="outline" onClick={() => navigate('/auth')}>
               Sign In
@@ -129,15 +109,9 @@ export const RootLayout = () => {
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end">
-              <DropdownMenuItem onClick={() => setTheme("light")}>
-                Light
-              </DropdownMenuItem>
-              <DropdownMenuItem onClick={() => setTheme("dark")}>
-                Dark
-              </DropdownMenuItem>
-              <DropdownMenuItem onClick={() => setTheme("system")}>
-                System
-              </DropdownMenuItem>
+              <DropdownMenuItem onClick={() => setTheme('light')}>Light</DropdownMenuItem>
+              <DropdownMenuItem onClick={() => setTheme('dark')}>Dark</DropdownMenuItem>
+              <DropdownMenuItem onClick={() => setTheme('system')}>System</DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
           <DropdownMenu>
@@ -146,7 +120,6 @@ export const RootLayout = () => {
                 <CircleUser className="h-5 w-5" />
                 <span className="sr-only">Toggle user menu</span>
               </Button> */}
-             
             </DropdownMenuTrigger>
           </DropdownMenu>
         </div>
