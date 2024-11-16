@@ -9,7 +9,7 @@ import { Loader2 } from 'lucide-react';
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useToast } from '@/hooks/use-toast';
-import { createUser, updateUser } from './auth.service';
+import { createUser, updateUser, getUser } from './auth.service';
 import { useUser } from '@/context/user.context';
 import { usePrivy } from '@privy-io/react-auth';
 
@@ -39,9 +39,26 @@ export function AuthScreen() {
         hasAcceptedTerms: privyUser.hasAcceptedTerms,
       });
 
-      saveUserToBackend();
+      checkUserDataAndNavigate();
     }
   }, [authenticated, privyUser]);
+
+  const checkUserDataAndNavigate = async () => {
+    try {
+      const email = privyUser?.google?.email || '';
+      const response = await getUser(email);
+      const userData = response.data.data;
+
+      if (userData?.achievements?.length > 0 && userData?.preferences?.length > 0) {
+        navigate('/home');
+      } else {
+        await saveUserToBackend();
+      }
+    } catch (error) {
+      console.error('Error checking user data:', error);
+      await saveUserToBackend();
+    }
+  };
 
   const saveUserToBackend = async () => {
     try {

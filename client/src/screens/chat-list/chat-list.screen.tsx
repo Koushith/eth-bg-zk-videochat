@@ -1,16 +1,13 @@
-import { useEffect, useState } from "react"
-import { useNavigate } from "react-router-dom"
-import { Plus } from "lucide-react"
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
-import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardHeader } from "@/components/ui/card"
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip"
-import axios from "axios"
-import { BACKEND_URL } from "@/utils/constants"
-import { useUser } from "@/context/user.context"
-
-// Remove this line as it's likely unnecessary
-// import "@/components/ui/button.css"
+import { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { Plus } from 'lucide-react';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardHeader } from '@/components/ui/card';
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
+import axios from 'axios';
+import { BACKEND_URL } from '@/utils/constants';
+import { useUser } from '@/context/user.context';
 
 interface Preference {
   name: string;
@@ -24,10 +21,10 @@ interface User {
 }
 
 export function ChatListScreen() {
-  const [users, setUsers] = useState<User[]>([])
-  const [preferences, setPreferences] = useState<Preference[]>([])
-  const navigate = useNavigate()
-  const { user } = useUser()
+  const [users, setUsers] = useState<User[]>([]);
+  const [preferences, setPreferences] = useState<Preference[]>([]);
+  const navigate = useNavigate();
+  const { user } = useUser();
 
   useEffect(() => {
     if (user && user.preferences) {
@@ -35,7 +32,7 @@ export function ChatListScreen() {
         .filter(([_, pref]) => typeof pref === 'object' && pref !== null)
         .map(([_, pref]) => ({
           name: (pref as { name: string }).name,
-          count: (pref as { count: number }).count
+          count: (pref as { count: number }).count,
         }));
       setPreferences(formattedPreferences);
     }
@@ -44,15 +41,15 @@ export function ChatListScreen() {
   const getUsersBasedOnPreferences = async () => {
     try {
       if (user && preferences.length > 0) {
-        console.log("Sending preferences:", preferences);
-        console.log("Sending email:", user.email);
+        console.log('Sending preferences:', preferences);
+        console.log('Sending email:', user.email);
 
         const { data } = await axios.post(`${BACKEND_URL}/api/user/get-users`, {
           preferences: preferences,
           email: user.email,
         });
 
-        console.log("Fetched users:", data.users);
+        console.log('Fetched users:', data.users);
         setUsers(data.users);
       } else {
         console.error('No logged in user found or preferences are missing');
@@ -60,7 +57,7 @@ export function ChatListScreen() {
     } catch (error) {
       console.error('Error fetching users based on preferences:', error);
     }
-  }
+  };
 
   useEffect(() => {
     if (user && preferences.length > 0) {
@@ -84,7 +81,9 @@ export function ChatListScreen() {
                   size="icon"
                   variant="outline"
                   className="rounded-full"
-                  onClick={() => { /* Handle new chat creation */ }}
+                  onClick={() => {
+                    /* Handle new chat creation */
+                  }}
                 >
                   <Plus className="h-5 w-5" />
                   <span className="sr-only">New chat</span>
@@ -103,7 +102,10 @@ export function ChatListScreen() {
                 onClick={() => navigate(`/chat/${user._id}`)}
               >
                 <Avatar className="h-12 w-12">
-                  <AvatarImage src={`https://api.dicebear.com/6.x/initials/svg?seed=${user.userName}`} alt={user.userName} />
+                  <AvatarImage
+                    src={`https://api.dicebear.com/6.x/initials/svg?seed=${user.userName}`}
+                    alt={user.userName}
+                  />
                   <AvatarFallback>{user.userName[0]}</AvatarFallback>
                 </Avatar>
                 <div>
@@ -116,5 +118,5 @@ export function ChatListScreen() {
         </CardContent>
       </Card>
     </div>
-  )
+  );
 }
